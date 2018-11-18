@@ -1,8 +1,8 @@
 #!/usr/bin/env python2.7
 
 """
-Columbia W4111 Intro to databases
-Example webserver
+Columbia W4111 Intro to Databases
+Example Webserver
 
 To run locally
 
@@ -18,7 +18,7 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, session, abort
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -36,8 +36,8 @@ app = Flask(__name__, template_folder=tmpl_dir)
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = "YOUR_DB_USERNAME_HERE"
-DB_PASSWORD = "YOUR_DB_PASSWORD_HERE"
+DB_USER = "ms5505"
+DB_PASSWORD = "1ktc6r12"
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 
@@ -101,7 +101,7 @@ def teardown_request(exception):
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
-@app.route('/')
+@app.route('/index')
 def index():
   """
   request is a special object that Flask provides to access web request information:
@@ -169,6 +169,45 @@ def index():
 # notice that the functio name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
+@app.route('/')
+def welcome():
+  if not session.get('logged_in'):
+    return render_template('welcome.html')
+  else:
+    return render_template('home.html')
+
+@app.route('/login')
+def login():
+  return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def do_admin_login():
+  if request.form['password'] == 'password' and request.form['email'] == 'admin@gmail.com':
+    session['logged_in'] = True
+  else:
+    flash('wrong password')
+  return welcome()
+
+@app.route('/createAccount')
+def createAccount():
+  return render_template('createAccount.html')
+
+@app.route('/home')
+def home():
+  return render_template('home.html')
+
+@app.route('/group')
+def group():
+  return render_template('group.html')
+
+@app.route('/wishlist_mine')
+def wishlist_mine():
+  return render_template('wishlist_mine.html')
+
+@app.route('/wishlist_other')
+def wishlist_other():
+  return render_template('wishlist_other.html')
+
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")
@@ -184,13 +223,9 @@ def add():
   return redirect('/')
 
 
-@app.route('/login')
-def login():
-    abort(401)
-    this_is_never_executed()
-
-
 if __name__ == "__main__":
+  app.secret_key = os.urandom(12)
+  app.run(debug=True, host='0.0.0.0', port=8111)
   import click
 
   @click.command()
