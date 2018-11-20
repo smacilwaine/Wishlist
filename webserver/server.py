@@ -18,7 +18,7 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, session, abort
+from flask import Flask, request, render_template, g, redirect, Response, session
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -182,17 +182,20 @@ def home():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    return render_template('home.html')
+    context = dict(uid = session['uid'], user_name = session['name'])
+    return render_template('home.html', **context)
 
 @app.route('/', methods=['POST'])
 def do_admin_login():
   before_request()
-  cursor = g.conn.execute("SELECT email, password FROM users")
+  cursor = g.conn.execute("SELECT * FROM users")
   foundMatch = False
   pw = ''
   for result in cursor:
     if result['email'] == request.form['email']:
       foundMatch = True
+      session['uid'] = result['uid']
+      session['name'] = result['name']
       pw = result['password'] # add use of Flask session capabilities to store current user name/id
   if foundMatch == False:
     print('email not found. Please create an account') # need to give option to redirect and create account on login.html

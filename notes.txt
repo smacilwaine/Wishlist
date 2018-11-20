@@ -2,7 +2,7 @@ TO-DO BEFORE SUBMIT:
 
 - See if we can update SELECT queries with WHERE (passing variables in) so we don't have to return every row in the table
 - Our database is very not secure lol
-
+- Need to create a logout route that pops the session variable
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:
