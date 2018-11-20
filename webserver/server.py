@@ -154,7 +154,6 @@ def index():
   #
   context = dict(data = names)
 
-
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
@@ -169,6 +168,15 @@ def index():
 # notice that the functio name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
+ 
+## NOTES ##  
+
+# context = dict(variableInHTML = variableHere, variable2InHTML = variable2Here) --> passed to 1 template
+# render return_template('home.html', **context)
+
+# cursor = g.conn.execute("""SQL COMMANDS HERE;""")     this is an array of all the result 
+# cursor.close()
+
 @app.route('/')
 def home():
   if not session.get('logged_in'):
@@ -178,10 +186,22 @@ def home():
 
 @app.route('/', methods=['POST'])
 def do_admin_login():
-  if request.form['password'] == 'password' and request.form['email'] == 'admin@gmail.com':
-    session['logged_in'] = True
+  before_request()
+  cursor = g.conn.execute("SELECT email, password FROM users")
+  foundMatch = False
+  pw = ''
+  for result in cursor:
+    if result['email'] == request.form['email']:
+      foundMatch = True
+      pw = result['password'] # add use of Flask session capabilities to store current user name/id
+  if foundMatch == False:
+    print('email not found. Please create an account') # need to give option to redirect and create account on login.html
   else:
-    flash('wrong password')
+    if pw == request.form['password']:
+      session['logged_in'] = True
+    else:
+      print('wrong password')
+  cursor.close()
   return home()
 
 @app.route('/createAccount')
