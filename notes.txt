@@ -1,0 +1,10 @@
+TO-DO BEFORE SUBMIT:
+
+- See if we can update SELECT queries with WHERE (passing variables in) so we don't have to return every row in the table
+- Our database is very not secure lol
+
+
+
+QUESTIONS TO ASK BEFORE WE SUBMIT:
+
+- Is it okay to just use cursor.close() after every request instead of teardown_request(exception)? If not, how do we pass an exception?
