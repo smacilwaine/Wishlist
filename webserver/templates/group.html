@@ -9,23 +9,23 @@
 
 <body>
 
-<p><a href="/home">Back to Groups</a></p>
+<p><a href="/">Back to Groups</a></p>
 
 <h1>Group X</h1>
 
-<h2>Members:</h2>
-<p>Mom</p>
-<p>Dad</p>
-<p>Samantha</p>
-<p>Natalie</p>
-<p>Patrick</p>
-<p>Jessica</p>
+<h2>Members: </h2>
+<div>
+	{% for m in members %}
+	<div>{{m[1]}}</div>
+	{% endfor %}
+</div>
 
 <h2>Wishlists</h2>
-<p>Samantha</p>
-<p>Natalie</p>
-<p>Patrick</p>
-<p>Jessica</p>
+<div>
+	{% for w in wishlists %} <!-- wid, uid, name -->
+	<div>{{w[2]}}</div>
+	{% endfor %}
+</div>
 
 </body>
 

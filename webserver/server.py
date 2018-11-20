@@ -188,19 +188,16 @@ def home():
 
     before_request()
     cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
-    gids = []
-    gnames = []
+    groups = []
     for result in cursor:
       if result['uid'] == session['uid']:
-        print('result for uid: ', result['gid'], result['name'])
-        gids.append(result['gid'])
-        gnames.append(result['name'])
-    print(gids)
-    print(gnames)
+        gr = []
+        gr.append(result['gid'])
+        gr.append(result['name'])
+        groups.append(gr)
     context = dict(uid = session['uid'], 
       user_name = session['name'],
-      group_ids = gids,
-      group_names = gnames)
+      groups = groups)
     return render_template('home.html', **context)
 
 @app.route('/', methods=['POST'])
@@ -229,9 +226,54 @@ def do_admin_login():
 def createAccount():
   return render_template('createAccount.html')
 
-@app.route('/group')
-def group():
-  return render_template('group.html')
+@app.route('/group/<gid>')
+### NOTE: uid is not currently an attribute in groups so finding the owner will fail until we add it
+def group(gid):
+  print('gid: ', gid)
+  # get group name (again)
+  groupname = ''
+  ownerid = 0
+  cursor = g.conn.execute("""SELECT * FROM groups;""")
+  for result in cursor:
+    if int(result['gid']) == int(gid):
+      groupname = result['name']
+      #ownerid = result['uid']
+  cursor.close()
+  print('groupname: ', groupname)
+
+  # get list of all members
+  members = [] # uid, name
+  owner = ''
+  cursor0 = g.conn.execute("""SELECT * FROM users_in_groups INNER JOIN users ON users_in_groups.uid = users.uid;""")
+  for result in cursor0:
+    if int(result['gid']) == int(gid):
+      member = []
+      member.append(result['uid'])
+      member.append(str(result['name']))
+      members.append(member)
+      if result['uid'] == ownerid:
+        owner = result['name']
+  cursor0.close()
+  print("all members: ", members)
+  #print('owner: ', owner)
+
+  # get all wishlists
+  wishlists = [] # wid, uid, name
+  cursor1 = g.conn.execute("""SELECT * FROM wishlist_in_group INNER JOIN user_adds_wishlist ON wishlist_in_group.wid = user_adds_wishlist.wid
+    INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
+  for result in cursor1:
+    if int(result['gid']) == int(gid):
+      print(result['wid'], result['uid'], result['name'])
+      wishlist = []
+      wishlist.append(result['wid'])
+      wishlist.append(result['uid'])
+      wishlist.append(result['name'])
+      wishlists.append(wishlist)  
+  cursor1.close()
+  print(wishlists)
+
+  context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists)
+  return render_template('group.html', **context)
 
 @app.route('/wishlist_mine')
 def wishlist_mine():

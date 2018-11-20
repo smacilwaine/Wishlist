@@ -1,9 +1,5 @@
 CURRENT UPDATE:
-- Just added the functionality to show specific groups for a user
-- But Sam is not in any groups
-- Need to check on the instance:
-	- if postgreSQL query is right
-	- if Sam is even in any groups
+- Working on routing for each specific group, transferring gid variable across pages
 
 
 TO-DO BEFORE SUBMIT:
@@ -11,12 +7,9 @@ TO-DO BEFORE SUBMIT:
 - See if we can update SELECT queries with WHERE (passing variables in) so we don't have to return every row in the table
 - Our database is very not secure lol
 - Need to create a logout route that pops the session variable
+- Add Flask cache extension to reduce number of requests to the database
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:
 
 - Is it okay to just use cursor.close() after every request instead of teardown_request(exception)? If not, how do we pass an exception?
-
-
-RESOURCES:
-- 

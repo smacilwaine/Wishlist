@@ -12,10 +12,12 @@
 
 <p>UID: {{uid}}</p>
 <div>
-	{% for g in group_names %}
-	<div><a href="/group">{{g}}</a></div>
+	{% for g in groups %}
+	<div><a href="/group/{{g[0]}}">{{g[1]}}</a></div>
 	{% endfor %}
 </div>
+
+<p>Join a new group! #TBD</p>
 
 </body>
 
