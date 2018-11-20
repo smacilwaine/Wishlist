@@ -170,31 +170,23 @@ def index():
 # the functions for each app.route needs to have different names
 #
 @app.route('/')
-def welcome():
+def home():
   if not session.get('logged_in'):
-    return render_template('welcome.html')
+    return render_template('login.html')
   else:
     return render_template('home.html')
 
-@app.route('/login')
-def login():
-  return render_template('login.html')
-
-@app.route('/login', methods=['POST'])
+@app.route('/', methods=['POST'])
 def do_admin_login():
   if request.form['password'] == 'password' and request.form['email'] == 'admin@gmail.com':
     session['logged_in'] = True
   else:
     flash('wrong password')
-  return welcome()
+  return home()
 
 @app.route('/createAccount')
 def createAccount():
   return render_template('createAccount.html')
-
-@app.route('/home')
-def home():
-  return render_template('home.html')
 
 @app.route('/group')
 def group():
@@ -225,14 +217,13 @@ def add():
 
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)
-  app.run(debug=True, host='0.0.0.0', port=8111)
   import click
 
   @click.command()
   @click.option('--debug', is_flag=True)
   @click.option('--threaded', is_flag=True)
   @click.argument('HOST', default='0.0.0.0')
-  @click.argument('PORT', default=8111, type=int)
+  @click.argument('PORT', default=7111, type=int)
   def run(debug, threaded, host, port):
     """
     This function handles command line parameters.
