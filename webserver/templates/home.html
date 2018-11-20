@@ -11,10 +11,11 @@
 <h1>Groups for {{user_name}}</h1>
 
 <p>UID: {{uid}}</p>
-
-<p><a href="/group">Group1</a></p>
-<p><a href="/group">Group2</a></p>
-<p><a href="/group">Group3</a></p>
+<div>
+	{% for g in group_names %}
+	<div><a href="/group">{{g}}</a></div>
+	{% endfor %}
+</div>
 
 </body>
 

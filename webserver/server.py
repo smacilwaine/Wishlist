@@ -182,13 +182,31 @@ def home():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    context = dict(uid = session['uid'], user_name = session['name'])
+    
+
+    ## pull all groups the user belongs to
+
+    before_request()
+    cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
+    gids = []
+    gnames = []
+    for result in cursor:
+      if result['uid'] == session['uid']:
+        print('result for uid: ', result['gid'], result['name'])
+        gids.append(result['gid'])
+        gnames.append(result['name'])
+    print(gids)
+    print(gnames)
+    context = dict(uid = session['uid'], 
+      user_name = session['name'],
+      group_ids = gids,
+      group_names = gnames)
     return render_template('home.html', **context)
 
 @app.route('/', methods=['POST'])
 def do_admin_login():
   before_request()
-  cursor = g.conn.execute("SELECT * FROM users")
+  cursor = g.conn.execute("""SELECT * FROM users;""")
   foundMatch = False
   pw = ''
   for result in cursor:
