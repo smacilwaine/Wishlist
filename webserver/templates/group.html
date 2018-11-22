@@ -11,21 +11,23 @@
 
 <p><a href="/">Back to Groups</a></p>
 
-<h1>Group X</h1>
+<h1>{{groupname}}</h1>
+<p>Group #{{gid}}</p>
 
-<h2>Members: </h2>
+<h2>Wishlists</h2>
+<div>
+	{% for w in wishlists %} <!-- wid, uid, name -->
+	<div><a href="/group/{{gid}}/wishlist/{{w[0]}}">{{w[2]}}</a></div>
+	{% endfor %}
+</div>
+
+<h3>Members: </h3>
 <div>
 	{% for m in members %}
 	<div>{{m[1]}}</div>
 	{% endfor %}
 </div>
 
-<h2>Wishlists</h2>
-<div>
-	{% for w in wishlists %} <!-- wid, uid, name -->
-	<div>{{w[2]}}</div>
-	{% endfor %}
-</div>
 
 </body>
 

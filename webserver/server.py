@@ -229,7 +229,6 @@ def createAccount():
 @app.route('/group/<gid>')
 ### NOTE: uid is not currently an attribute in groups so finding the owner will fail until we add it
 def group(gid):
-  print('gid: ', gid)
   # get group name (again)
   groupname = ''
   ownerid = 0
@@ -239,7 +238,6 @@ def group(gid):
       groupname = result['name']
       #ownerid = result['uid']
   cursor.close()
-  print('groupname: ', groupname)
 
   # get list of all members
   members = [] # uid, name
@@ -254,8 +252,6 @@ def group(gid):
       if result['uid'] == ownerid:
         owner = result['name']
   cursor0.close()
-  print("all members: ", members)
-  #print('owner: ', owner)
 
   # get all wishlists
   wishlists = [] # wid, uid, name
@@ -263,25 +259,21 @@ def group(gid):
     INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
   for result in cursor1:
     if int(result['gid']) == int(gid):
-      print(result['wid'], result['uid'], result['name'])
       wishlist = []
       wishlist.append(result['wid'])
       wishlist.append(result['uid'])
       wishlist.append(result['name'])
       wishlists.append(wishlist)  
   cursor1.close()
-  print(wishlists)
 
-  context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists)
+  context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists, groupname = groupname)
   return render_template('group.html', **context)
 
-@app.route('/wishlist_mine')
-def wishlist_mine():
-  return render_template('wishlist_mine.html')
-
-@app.route('/wishlist_other')
-def wishlist_other():
-  return render_template('wishlist_other.html')
+@app.route('/group/<gid>/wishlist/<wid>')
+def show_wishlist(gid, wid):
+  print(gid, wid)
+  context = dict(gid = gid, wid = wid)
+  return render_template('wishlist.html', **context)
 
 @app.route('/another')
 def another():
