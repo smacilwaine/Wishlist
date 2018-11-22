@@ -272,7 +272,14 @@ def group(gid):
 @app.route('/group/<gid>/wishlist/<wid>')
 def show_wishlist(gid, wid):
   print(gid, wid)
-  context = dict(gid = gid, wid = wid)
+  # need to show user's name: get uid from wid and then join with users
+  author_name = ''
+  cursor = g.conn.execute("""SELECT * FROM user_adds_wishlist INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
+  for result in cursor:
+    if int(result['wid']) == int(wid):
+      author_name = result['name']
+  cursor.close()
+  context = dict(gid = gid, wid = wid, name = author_name)
   return render_template('wishlist.html', **context)
 
 @app.route('/another')
