@@ -271,21 +271,32 @@ def group(gid):
 
 @app.route('/group/<gid>/wishlist/<wid>')
 def show_wishlist(gid, wid):
-  print(gid, wid)
-  # need to show user's name: get uid from wid and then join with users
+
+  # get wishlist author's name
   author_name = ''
   cursor = g.conn.execute("""SELECT * FROM user_adds_wishlist INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
   for result in cursor:
     if int(result['wid']) == int(wid):
       author_name = result['name']
   cursor.close()
-  context = dict(gid = gid, wid = wid, name = author_name)
+
+  # get items in wishlist (using items_in_wishlist join user_adds_items)
+  items = []
+  cursor0 = g.conn.execute("""SELECT * from items_in_wishlist inner join user_adds_items on items_in_wishlist.iid = user_adds_items.iid;""")
+  # result: wid id uid item name(description) added uid 
+  for result in cursor0:
+    if int(result['wid']) == int(wid):
+      item = []
+      item.append(result['iid'])
+      item.append(result['iname'])
+      items.append(item)
+  cursor0.close()
+  context = dict(gid = gid, wid = wid, name = author_name, items = items)
   return render_template('wishlist.html', **context)
 
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")
-
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
