@@ -183,6 +183,8 @@ def home():
     return render_template('login.html')
   else:
     ## pull all groups the user belongs to
+    se = session.get('uid')
+    print(se, ' is logged in on home page ')
     before_request()
     cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
     groups = []
@@ -199,7 +201,7 @@ def home():
     return render_template('home.html', **context)
 
 @app.route('/', methods=['POST'])
-def do_admin_login():
+def login():
   before_request()
   cursor = g.conn.execute("""SELECT * FROM users;""")
   foundMatch = False
@@ -215,6 +217,7 @@ def do_admin_login():
   else:
     if pw == request.form['password']:
       session['logged_in'] = True
+      print('logged in with session, ', session['uid'])
     else:
       print('wrong password')
   cursor.close()
@@ -228,6 +231,9 @@ def createAccount():
 ### NOTE: uid is not currently an attribute in groups so finding the owner will fail until we add it
 def group(gid):
   # get group name (again)
+  if session.get('uid'):
+    print('group page session uid: ', session.get('uid'))
+  else: print('not in session on group page')
   groupname = ''
   ownerid = 0
   cursor = g.conn.execute("""SELECT * FROM groups;""")
@@ -270,10 +276,15 @@ def group(gid):
 @app.route('/group/<gid>/wishlist/<wid>')
 def show_wishlist(gid, wid):
 
+  session_uid = 0
+  if session.get('uid'):
+    print('session in wishlist page: ', session.get('uid'))
+    session_uid = session['uid']
+  else: print('wishlist page not in session!!!')
+
   # get wishlist author's name
   author_name = ''
   author_uid = 0
-
   cursor = g.conn.execute("""SELECT * FROM user_adds_wishlist INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
   for result in cursor:
     if int(result['wid']) == int(wid):
@@ -291,19 +302,42 @@ def show_wishlist(gid, wid):
       item.append(result['iid'])
       item.append(result['iname'])
       items.append(item)
-  session_uid = 0
-  if 'uid' in session:
-    print('uid in session')
-    session_uid = session['uid']
   cursor0.close()
 
+  table = []
   # get comments UNLESS user is viewing her own wishlist
-  comments = []
-  print(session_uid, author_uid)
   if int(session_uid) != int(author_uid):
-    comment = 'This is a comment because you are not viewing your own wishlist'
-    comments.append(comment)
-  context = dict(gid = gid, wid = wid, name = author_name, items = items, comments = comments)
+    comments = []
+    cursor1 = g.conn.execute("""SELECT * from items_in_wishlist inner join user_post_comments 
+      on items_in_wishlist.iid = user_post_comments.iid inner join users on user_post_comments.cuid = users.uid;""")
+    for result in cursor1:
+      if int(result['wid']) == int(wid): # for each row relating to this wishlist
+        comment = [] # cuid iid body name
+        comment.append(result['cuid'])
+        comment.append(result['iid'])
+        comment.append(result['body'])
+        comment.append(result['name'])
+        comments.append(comment)
+    
+    # sort comments into table row stuff
+    
+    for i in items:
+      tablerow = []
+      tablerow.append(i)
+      for c in comments:
+        if c[1] == i[0]: #if item id of comment matches item id of item
+          tablerow.append(c)
+          # could potentially make this faster by removing comment c after it's added to a table row
+      table.append(tablerow)
+  else: # remove this later when we're returning separate files
+    for i in items:
+      tablerow = []
+      tablerow.append(i)
+      table.append(tablerow)
+
+  print(table)
+
+  context = dict(gid = gid, wid = wid, name = author_name, table = table)
   return render_template('wishlist.html', **context)
 
 @app.route('/another')
@@ -318,7 +352,6 @@ def add():
   cmd = 'INSERT INTO test(name) VALUES (:name1), (:name2)';
   g.conn.execute(text(cmd), name1 = name, name2 = name);
   return redirect('/')
-
 
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)

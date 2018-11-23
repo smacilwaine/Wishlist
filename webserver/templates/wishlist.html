@@ -12,13 +12,19 @@
 <p><a href='/group/{{gid}}'>Back</a></p>
 <h1>{{name}}'s Wishlist</h1>
 
-<div>
-	{% for i in items %} <!-- id, name -->
-	<div><p><b>{{i[1]}}</b></p></div>
+<table>
+<!-- show table --> 
+	{% for row in table %}
+	<tr>
+		<td><b>{{row[0][1]}}</b></td>
+		{% for comment in row %}
+			{% if comment[3] %} <!-- if not the header --> 
+				<td><i>{{comment[3]}}</i>: {{comment[2]}}</td>
+			{% endif %}
+		{% endfor %}
+	</tr>
 	{% endfor %}
-</div>
-
-<p>{{comments[0]}}</p>
+</table>
 
 </body>
 
