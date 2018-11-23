@@ -184,7 +184,6 @@ def home():
   else:
     ## pull all groups the user belongs to
     se = session.get('uid')
-    print(se, ' is logged in on home page ')
     before_request()
     cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
     groups = []
@@ -217,7 +216,6 @@ def login():
   else:
     if pw == request.form['password']:
       session['logged_in'] = True
-      print('logged in with session, ', session['uid'])
     else:
       print('wrong password')
   cursor.close()
@@ -235,9 +233,6 @@ def group(gid):
     return render_template('login.html')
   else:
     # get group name (again)
-    if session.get('uid'):
-      print('group page session uid: ', session.get('uid'))
-    else: print('not in session on group page')
     groupname = ''
     ownerid = 0
     cursor = g.conn.execute("""SELECT * FROM groups;""")
@@ -284,7 +279,6 @@ def show_wishlist(gid, wid):
   else:
     session_uid = 0
     if session.get('uid'):
-      print('session in wishlist page: ', session.get('uid'))
       session_uid = session['uid']
     else: print('wishlist page not in session!!!')
 
