@@ -15,7 +15,7 @@ A debugger such as "pdb" may be helpful for debugging.
 Read about it online.
 """
 
-import os
+import os, arrow
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, session
@@ -329,16 +329,46 @@ def show_wishlist(gid, wid):
             tablerow.append(c)
             # could potentially make this faster by removing comment c after it's added to a table row
         table.append(tablerow)
-    else: # remove this later when we're returning separate files
+
+      context = dict(gid = gid, wid = wid, name = author_name, table = table)
+      return render_template('wishlist.html', **context)
+    
+    else:
       for i in items:
         tablerow = []
         tablerow.append(i)
         table.append(tablerow)
+      context = dict(gid = gid, wid = wid, name = author_name, table = table)
+      return render_template('wishlist_mine.html', **context)
 
-    print(table)
+@app.route('/group/<gid>/wishlist/<wid>/i', methods=['POST'])
+def add_item_to_wishlist(gid, wid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    print('item added')
 
-    context = dict(gid = gid, wid = wid, name = author_name, table = table)
-    return render_template('wishlist.html', **context)
+    # get most recent iid
+    cursor = g.conn.execute("""SELECT MAX(iid) FROM user_adds_items;""")
+    for result in cursor:
+      iid = int(result[0]) + 1
+      print('new iid is ', iid)
+    cursor.close()
+
+    # create item
+    uid = session.get('uid')
+    it = request.form['item']
+    added_date = arrow.now().format('YYYY-MM-DD')
+    cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
+    cursor0 = g.conn.execute(text(cmd), iid = iid, iname = it, added_date = added_date, uid = uid)
+    cursor0.close()
+
+    # add item to wishlist
+    cmd0 = 'INSERT INTO items_in_wishlist (wid, iid, uid) VALUES (:wid, :iid, :uid);'
+    cursor1 = g.conn.execute(text(cmd), wid = wid, iid = iid, uid = uid)
+    cursor1.close()
+
+    return show_wishlist(gid, wid)
 
 @app.route('/another')
 def another():

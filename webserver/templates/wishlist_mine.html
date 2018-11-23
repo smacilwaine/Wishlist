@@ -8,10 +8,27 @@
 
 
 <body>
+
+<p><a href='/group/{{gid}}'>Back</a></p>
 <h1>My Wishlist</h1>
 
-<p>Showing all the items that I like here!</p>
-<p>I can't see the comments or anything.</p>
+<table>
+<!-- show table --> 
+	{% for row in table %}
+	<tr>
+		<td><b>{{row[0][1]}}</b></td>
+		<td>delete</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td>
+			<form action='/group/{{gid}}/wishlist/{{wid}}/i' method='POST'>
+				<input type='text' name='item' placeholder='new item'>
+				<input type='submit' value='Add'>
+			</form>
+		</td>
+	</tr>
+</table>
 
 </body>
 
