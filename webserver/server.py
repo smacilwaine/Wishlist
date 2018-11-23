@@ -182,10 +182,7 @@ def home():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    
-
     ## pull all groups the user belongs to
-
     before_request()
     cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
     groups = []
@@ -195,6 +192,7 @@ def home():
         gr.append(result['gid'])
         gr.append(result['name'])
         groups.append(gr)
+    cursor.close()
     context = dict(uid = session['uid'], 
       user_name = session['name'],
       groups = groups)
@@ -274,10 +272,13 @@ def show_wishlist(gid, wid):
 
   # get wishlist author's name
   author_name = ''
+  author_uid = 0
+
   cursor = g.conn.execute("""SELECT * FROM user_adds_wishlist INNER JOIN users ON user_adds_wishlist.uid = users.uid;""")
   for result in cursor:
     if int(result['wid']) == int(wid):
       author_name = result['name']
+      author_uid = result['uid']
   cursor.close()
 
   # get items in wishlist (using items_in_wishlist join user_adds_items)
@@ -290,8 +291,19 @@ def show_wishlist(gid, wid):
       item.append(result['iid'])
       item.append(result['iname'])
       items.append(item)
+  session_uid = 0
+  if 'uid' in session:
+    print('uid in session')
+    session_uid = session['uid']
   cursor0.close()
-  context = dict(gid = gid, wid = wid, name = author_name, items = items)
+
+  # get comments UNLESS user is viewing her own wishlist
+  comments = []
+  print(session_uid, author_uid)
+  if int(session_uid) != int(author_uid):
+    comment = 'This is a comment because you are not viewing your own wishlist'
+    comments.append(comment)
+  context = dict(gid = gid, wid = wid, name = author_name, items = items, comments = comments)
   return render_template('wishlist.html', **context)
 
 @app.route('/another')

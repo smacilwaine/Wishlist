@@ -12,16 +12,13 @@
 <p><a href='/group/{{gid}}'>Back</a></p>
 <h1>{{name}}'s Wishlist</h1>
 
-<p> wid = {{wid}} <p>
-
-<p>Showing all the items that my friend likes here!</p>
-<p>I can add things, comment, or highlight certain items!</p>
-
 <div>
 	{% for i in items %} <!-- id, name -->
 	<div><p><b>{{i[1]}}</b></p></div>
 	{% endfor %}
 </div>
+
+<p>{{comments[0]}}</p>
 
 </body>
 
