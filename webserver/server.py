@@ -346,27 +346,23 @@ def add_item_to_wishlist(gid, wid):
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    print('item added')
-
     # get most recent iid
     cursor = g.conn.execute("""SELECT MAX(iid) FROM user_adds_items;""")
     for result in cursor:
       iid = int(result[0]) + 1
-      print('new iid is ', iid)
     cursor.close()
 
     # create item
     uid = session.get('uid')
-    iname = request.form['item']
+    it = request.form['item']
     added_date = arrow.now().format('YYYY-MM-DD')
-    #cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
-    #cursor0 = g.conn.execute(text(cmd), iid = iid, iname = iname, added_date = added_date, uid = uid)
-    cursor0 = g.conn.execute(text("INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES ( :iid, :iname, :added_date, :uid )"), {":iid": iid, ":iname": iname, ":added_date": added_date, ":uid" : uid})
+    cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
+    cursor0 = g.conn.execute(text(cmd), iid = iid, iname = it, added_date = added_date, uid = uid)
     cursor0.close()
 
     # add item to wishlist
     cmd0 = 'INSERT INTO items_in_wishlist (wid, iid, uid) VALUES (:wid, :iid, :uid);'
-    cursor1 = g.conn.execute(text(cmd), wid = wid, iid = iid, uid = uid)
+    cursor1 = g.conn.execute(text(cmd0), wid = wid, iid = iid, uid = uid)
     cursor1.close()
 
     return show_wishlist(gid, wid)
