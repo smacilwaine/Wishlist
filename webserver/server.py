@@ -225,8 +225,34 @@ def login():
 def createAccount():
   return render_template('createAccount.html')
 
-@app.route('/group/<gid>')
+@app.route('/new_group', methods=['POST'])
+def create_new_group():
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    # get group name
+    group_name = request.form['group_name'] # does not need to be unique
 
+    # get new group id
+    cursor = g.conn.execute("""SELECT MAX(gid) FROM groups;""")
+    for result in cursor:
+      gid = int(result[0]) + 1
+    cursor.close()
+
+    # create group
+    cmd0 = 'INSERT INTO groups (gid, name) VALUES (:gid, :name)'
+    cursor0 = g.conn.execute(text(cmd0), gid = gid, name = group_name)
+    cursor0.close()
+
+    # add owner to group
+    uid = session.get('uid')
+    cmd1 = 'INSERT INTO users_in_groups (uid, gid) VALUES (:uid, :gid)'
+    cursor1 = g.conn.execute(text(cmd1), uid = uid, gid = gid)
+    cursor1.close()
+
+    return group(gid)
+
+@app.route('/group/<gid>')
 ### NOTE: uid is not currently an attribute in groups so finding the owner will fail until we add it
 def group(gid):
   if not session.get('logged_in'):
@@ -269,8 +295,47 @@ def group(gid):
         wishlists.append(wishlist)  
     cursor1.close()
 
-    context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists, groupname = groupname)
+    # check for wishlist in group with gid and uid
+    uid = session.get('uid')
+    cmd2 = 'SELECT count(wid) from wishlist_in_group where uid = :uidno and gid = :gidno'
+    cursor2 = g.conn.execute(text(cmd2), uidno = uid, gidno = gid)
+    for result in cursor2:
+      whlistno = result[0]
+    cursor2.close()
+
+    if whlistno != 0: # if there is already a wishlist for this user in this group
+      create_wishlist = 0
+    else:
+      create_wishlist = 1
+
+    context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists, groupname = groupname, create_wishlist = create_wishlist)
     return render_template('group.html', **context)
+
+@app.route('/group/<gid>/new_wishlist')
+def create_new_wishlist(gid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    print('creating new wishlist in group ', gid)
+
+    # get new wishlist id
+    cursor = g.conn.execute("""SELECT MAX(wid) FROM user_adds_wishlist;""")
+    for result in cursor:
+      wid = int(result[0]) + 1
+    cursor.close()
+
+    uid = session.get('uid')
+    # create new wishlist
+    cmd0 = 'INSERT INTO user_adds_wishlist VALUES (:wid, :uid)'
+    cursor0 = g.conn.execute(text(cmd0), uid = uid, wid = wid)
+    cursor0.close()
+
+    # add wishlist to group
+    cmd1 = 'INSERT INTO wishlist_in_group VALUES (:uid, :wid, :gid)'
+    cursor1 = g.conn.execute(text(cmd1), uid = uid, wid = wid, gid = gid)
+    cursor1.close()
+
+    return group(gid)
 
 @app.route('/group/<gid>/wishlist/<wid>')
 def show_wishlist(gid, wid):
@@ -426,33 +491,6 @@ def delete_comment(gid, wid, cid):
     cursor = g.conn.execute(text(cmd), cid = cid)
     cursor.close()
     return show_wishlist(gid, wid)
-
-@app.route('/new_group', methods=['POST'])
-def create_new_group():
-  if not session.get('logged_in'):
-    return render_template('login.html')
-  else:
-    # get group name
-    group_name = request.form['group_name'] # does not need to be unique
-
-    # get new group id
-    cursor = g.conn.execute("""SELECT MAX(gid) FROM groups;""")
-    for result in cursor:
-      gid = int(result[0]) + 1
-    cursor.close()
-
-    # create group
-    cmd0 = 'INSERT INTO groups (gid, name) VALUES (:gid, :name)'
-    cursor0 = g.conn.execute(text(cmd0), gid = gid, name = group_name)
-    cursor0.close()
-
-    # add owner to group
-    uid = session.get('uid')
-    cmd1 = 'INSERT INTO users_in_groups (uid, gid) VALUES (:uid, :gid)'
-    cursor1 = g.conn.execute(text(cmd1), uid = uid, gid = gid)
-    cursor1.close()
-
-    return group(gid)
 
 @app.route('/another')
 def another():

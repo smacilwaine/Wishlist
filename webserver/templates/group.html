@@ -15,6 +15,13 @@
 <p>Group #{{gid}}</p>
 
 <h2>Wishlists</h2>
+
+{% if create_wishlist %}
+<div>
+	<a href="/group/{{gid}}/new_wishlist">Create New Wishlist</a>
+</div>
+{% endif %}
+
 <div>
 	{% for w in wishlists %} <!-- wid, uid, name -->
 	<div><a href="/group/{{gid}}/wishlist/{{w[0]}}">{{w[2]}}</a></div>
