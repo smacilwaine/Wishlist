@@ -367,6 +367,21 @@ def add_item_to_wishlist(gid, wid):
 
     return show_wishlist(gid, wid)
 
+@app.route('/group/<gid>/wishlist/<wid>/d/<iid>')
+def remove_item_from_wishlist(gid, wid, iid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    # remove from items_in_wishlist
+    cmd = 'DELETE FROM items_in_wishlist WHERE iid = :id;'
+    cursor = g.conn.execute(text(cmd), id = iid)
+    cursor.close()
+    # remove from user_adds_items
+    cmd0 = 'DELETE FROM user_adds_items WHERE iid = :id;'
+    cursor1 = g.conn.execute(text(cmd0), id = iid)
+    cursor1.close()
+    return show_wishlist(gid, wid)
+
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")
