@@ -427,6 +427,33 @@ def delete_comment(gid, wid, cid):
     cursor.close()
     return show_wishlist(gid, wid)
 
+@app.route('/new_group', methods=['POST'])
+def create_new_group():
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    # get group name
+    group_name = request.form['group_name'] # does not need to be unique
+
+    # get new group id
+    cursor = g.conn.execute("""SELECT MAX(gid) FROM groups;""")
+    for result in cursor:
+      gid = int(result[0]) + 1
+    cursor.close()
+
+    # create group
+    cmd0 = 'INSERT INTO groups (gid, name) VALUES (:gid, :name)'
+    cursor0 = g.conn.execute(text(cmd0), gid = gid, name = group_name)
+    cursor0.close()
+
+    # add owner to group
+    uid = session.get('uid')
+    cmd1 = 'INSERT INTO users_in_groups (uid, gid) VALUES (:uid, :gid)'
+    cursor1 = g.conn.execute(text(cmd1), uid = uid, gid = gid)
+    cursor1.close()
+
+    return group(gid)
+
 @app.route('/another')
 def another():
   return render_template("anotherfile.html")

@@ -20,7 +20,11 @@
 	{% endfor %}
 </div>
 
-<p>Join a new group! #TBD</p>
+<p>Create a new group!</p>
+  <form action='/new_group' method='POST'>
+    <input type='text' name='group_name' placeholder='group name'>
+    <input type='submit' value='Create New Group'>
+  </form>
 
 </body>
 
