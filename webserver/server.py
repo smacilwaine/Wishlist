@@ -311,6 +311,27 @@ def group(gid):
     context = dict(gid = gid, owner = owner, members = members, wishlists = wishlists, groupname = groupname, create_wishlist = create_wishlist)
     return render_template('group.html', **context)
 
+@app.route('/group/<gid>/add_members', methods=['POST'])
+def add_member_to_group(gid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    email = request.form['email']
+
+    # find the corresponding uid
+    cmd = 'SELECT uid FROM users WHERE email = :email_addr'
+    cursor = g.conn.execute(text(cmd), email_addr = email)
+    for result in cursor:
+      new_mem_uid = result[0]
+    cursor.close()
+
+    # add user to group
+    cmd0 = 'INSERT INTO users_in_groups VALUES (:uid, :gid)'
+    cursor0 = g.conn.execute(text(cmd0), uid = new_mem_uid, gid = gid)
+    cursor0.close()
+
+    return group(gid)
+
 @app.route('/group/<gid>/new_wishlist')
 def create_new_wishlist(gid):
   if not session.get('logged_in'):
@@ -491,6 +512,19 @@ def delete_comment(gid, wid, cid):
     cursor = g.conn.execute(text(cmd), cid = cid)
     cursor.close()
     return show_wishlist(gid, wid)
+
+@app.route('/group/<gid>/leave_group')
+def leave_group(gid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    uid = session.get('uid')
+
+    # remove all comments on items from wishlists included in that group
+
+    # remove that user's wishlist in the group (*will automatically remove items)
+
+    # remove user from users_in_groups
 
 @app.route('/another')
 def another():

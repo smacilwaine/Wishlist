@@ -13,6 +13,10 @@ TO-DO BEFORE SUBMIT:
 - Add a notifications feature at the home button to alert when any comments are deleted; create this using a trigger on delete from user_posts_comments
 - change input fields to on-click-enter submit instead of having a button
 - let users edit as well as delete their comments
+- test to make sure the database prevents users from having the same email address
+- allow users to change their passwords (last)
+- add javascript confirm box before users leave a group
+- add quicklinks to wishlist from homepage (takes you to within the group)
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:

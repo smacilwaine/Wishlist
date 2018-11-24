@@ -35,6 +35,14 @@
 	{% endfor %}
 </div>
 
+<h3>Add Members</h3>
+<form action='/group/{{gid}}/add_members' method='POST'>
+	<input type='text' name='email' placeholder='Enter new member email'>
+	<input type='submit' value='Add to Group'>
+</form>
+
+<p><a href='/group/{{gid}}/leave_group'>Leave Group</a></p>
+
 
 </body>
 
