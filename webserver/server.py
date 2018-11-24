@@ -357,10 +357,11 @@ def add_item_to_wishlist(gid, wid):
 
     # create item
     uid = session.get('uid')
-    it = request.form['item']
+    iname = request.form['item']
     added_date = arrow.now().format('YYYY-MM-DD')
-    cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
-    cursor0 = g.conn.execute(text(cmd), iid = iid, iname = it, added_date = added_date, uid = uid)
+    #cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
+    #cursor0 = g.conn.execute(text(cmd), iid = iid, iname = iname, added_date = added_date, uid = uid)
+    cursor0 = g.conn.execute(text("INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES ( :iid, :iname, :added_date, :uid )"), {":iid": iid, ":iname": iname, ":added_date": added_date, ":uid" : uid})
     cursor0.close()
 
     # add item to wishlist
