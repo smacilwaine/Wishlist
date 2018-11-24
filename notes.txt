@@ -4,10 +4,14 @@ CURRENT UPDATE:
 
 TO-DO BEFORE SUBMIT:
 
+**problem**: If no previous comments exist, comment input does not show up (need a jinja input statement for this)
+
 - See if we can update SELECT queries with WHERE (passing variables in) so we don't have to return every row in the table
 - Our database is very not secure lol
 - Need to create a logout route that pops the session variable
 - Add Flask cache extension to reduce number of requests to the database
+- Add a notifications feature at the home button to alert when any comments are deleted; create this using a trigger on delete from user_posts_comments
+- change input fields to on-click-enter submit instead of having a button
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:

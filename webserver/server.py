@@ -356,13 +356,13 @@ def add_item_to_wishlist(gid, wid):
     uid = session.get('uid')
     it = request.form['item']
     added_date = arrow.now().format('YYYY-MM-DD')
-    cmd = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
-    cursor0 = g.conn.execute(text(cmd), iid = iid, iname = it, added_date = added_date, uid = uid)
+    cmd0 = 'INSERT INTO user_adds_items (iid, iname, added_date, uid) VALUES (:iid, :iname, :added_date, :uid);'
+    cursor0 = g.conn.execute(text(cmd0), iid = iid, iname = it, added_date = added_date, uid = uid)
     cursor0.close()
 
     # add item to wishlist
-    cmd0 = 'INSERT INTO items_in_wishlist (wid, iid, uid) VALUES (:wid, :iid, :uid);'
-    cursor1 = g.conn.execute(text(cmd0), wid = wid, iid = iid, uid = uid)
+    cmd1 = 'INSERT INTO items_in_wishlist (wid, iid, uid) VALUES (:wid, :iid, :uid);'
+    cursor1 = g.conn.execute(text(cmd1), wid = wid, iid = iid, uid = uid)
     cursor1.close()
 
     return show_wishlist(gid, wid)
@@ -376,10 +376,46 @@ def remove_item_from_wishlist(gid, wid, iid):
     cmd = 'DELETE FROM items_in_wishlist WHERE iid = :id;'
     cursor = g.conn.execute(text(cmd), id = iid)
     cursor.close()
-    # remove from user_adds_items
+    # remove from user_adds_items (which also removes from user_post_comments)
     cmd0 = 'DELETE FROM user_adds_items WHERE iid = :id;'
-    cursor1 = g.conn.execute(text(cmd0), id = iid)
+    cursor0 = g.conn.execute(text(cmd0), id = iid)
+    cursor0.close()
+    return show_wishlist(gid, wid)
+
+@app.route('/group/<gid>/wishlist/<wid>/c/<iid>', methods=['POST'])
+def comment_on_item(gid, wid, iid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    
+    # get new cid
+    cursor = g.conn.execute("""SELECT MAX(cid) FROM user_post_comments;""")
+    for result in cursor:
+      cid = int(result[0]) + 1
+    cursor.close()
+
+    # get cuid
+    cuid = session.get('uid')
+
+    # get uid
+    uid = 0
+    cmd0 = 'SELECT uid from user_adds_items where iid = :id'
+    cursor0 = g.conn.execute(text(cmd0), id = iid)
+    for result in cursor0:
+      uid = result[0]
+    cursor0.close()
+
+    # get post_date
+    post_date = arrow.now().format('YYYY-MM-DD')
+
+    # get body
+    body = request.form['comment']
+
+    # add the comment
+    cmd1 = 'INSERT INTO user_post_comments (uid, iid, cuid, cid, body, post_date) VALUES (:uid, :iid, :cuid, :cid, :body, :post_date);'
+    cursor1 = g.conn.execute(text(cmd1), uid = uid, iid = iid, cuid = cuid, cid = cid, body = body, post_date = post_date)
     cursor1.close()
+
     return show_wishlist(gid, wid)
 
 @app.route('/another')

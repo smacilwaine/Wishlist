@@ -22,6 +22,12 @@
 				<td><i>{{comment[3]}}</i>: {{comment[2]}}</td>
 			{% endif %}
 		{% endfor %}
+		<td>
+			<form action='/group/{{gid}}/wishlist/{{wid}}/c/{{row[0][0]}}' method='POST'>
+				<input type='text' name='comment' placeholder='add comment'>
+				<input type='submit' value='Add'>
+			</form>
+		</td>
 	</tr>
 	{% endfor %}
 </table>
