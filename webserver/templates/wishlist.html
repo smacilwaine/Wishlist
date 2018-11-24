@@ -20,6 +20,13 @@
 		{% for comment in row %}
 			{% if comment[3] %} <!-- if not the header --> 
 				<td><i>{{comment[3]}}</i>: {{comment[2]}}</td>
+				{% if uid == comment[0] %}
+				<td>
+					<form action='/group/{{gid}}/wishlist/{{wid}}/dc/{{comment[4]}}' method='POST'>
+						<input type='submit' value='delete'>
+					</form>
+				</td>
+				{% endif %}
 			{% endif %}
 		{% endfor %}
 		<td>

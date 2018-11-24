@@ -12,6 +12,7 @@ TO-DO BEFORE SUBMIT:
 - Add Flask cache extension to reduce number of requests to the database
 - Add a notifications feature at the home button to alert when any comments are deleted; create this using a trigger on delete from user_posts_comments
 - change input fields to on-click-enter submit instead of having a button
+- let users edit as well as delete their comments
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:

@@ -277,10 +277,7 @@ def show_wishlist(gid, wid):
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    session_uid = 0
-    if session.get('uid'):
-      session_uid = session['uid']
-    else: print('wishlist page not in session!!!')
+    session_uid = session['uid']
 
     # get wishlist author's name
     author_name = ''
@@ -317,6 +314,7 @@ def show_wishlist(gid, wid):
           comment.append(result['iid'])
           comment.append(result['body'])
           comment.append(result['name'])
+          comment.append(result['cid'])
           comments.append(comment)
       
       # sort comments into table row stuff
@@ -330,7 +328,7 @@ def show_wishlist(gid, wid):
             # could potentially make this faster by removing comment c after it's added to a table row
         table.append(tablerow)
 
-      context = dict(gid = gid, wid = wid, name = author_name, table = table)
+      context = dict(gid = gid, wid = wid, name = author_name, table = table, uid = session_uid)
       return render_template('wishlist.html', **context)
     
     else:
@@ -416,6 +414,17 @@ def comment_on_item(gid, wid, iid):
     cursor1 = g.conn.execute(text(cmd1), uid = uid, iid = iid, cuid = cuid, cid = cid, body = body, post_date = post_date)
     cursor1.close()
 
+    return show_wishlist(gid, wid)
+
+@app.route('/group/<gid>/wishlist/<wid>/dc/<cid>', methods=['POST'])
+def delete_comment(gid, wid, cid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+    # remove comment
+    cmd = 'DELETE FROM user_post_comments WHERE cid = :cid;'
+    cursor = g.conn.execute(text(cmd), cid = cid)
+    cursor.close()
     return show_wishlist(gid, wid)
 
 @app.route('/another')
