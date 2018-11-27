@@ -1,5 +1,5 @@
 CURRENT UPDATE:
-- Working on routing for each specific group, transferring gid variable across pages
+*********Need to test the leave_group, createAccount, AND deleteAccount functions (NONE HAVE BEEN TESTED!!!!!!!)
 
 
 TO-DO BEFORE SUBMIT:
@@ -17,6 +17,8 @@ TO-DO BEFORE SUBMIT:
 - allow users to change their passwords (last)
 - add javascript confirm box before users leave a group
 - add quicklinks to wishlist from homepage (takes you to within the group)
+- Show all wishlists in the home page
+- Add change password feature
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:

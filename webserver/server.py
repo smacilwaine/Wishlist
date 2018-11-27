@@ -228,7 +228,48 @@ def logout():
 
 @app.route('/createAccount')
 def createAccount():
-  return render_template('createAccount.html')
+
+  # get form info
+  name = request.form['name']
+  email = request.form['email']
+  password = request.form['password']
+
+  # check that email is not taken
+  cmd1 = 
+  emailTaken = 0
+  cursor1 = g.conn.execute(cmd1, email = email)
+  for result in cursor1: # should only be one result
+    if result[0] != 0:
+      emailTaken = 1
+  if emailTaken == 1:
+    errorMessage = "This email is already taken."
+    context = dict(emailTaken = errorMessage)
+    return render_template('createAccount.html', **context)
+  else: 
+    # get next available uid
+    cursor = g.conn.execute("""SELECT MAX(uid) FROM users;""")
+      for result in cursor:
+        uid = int(result[0]) + 1
+      cursor.close()
+
+    # add to users
+    cmd0 = 'INSERT INTO users (uid, name, email, password) VALUES (:uid, :name, :email, :password);'
+    cursor0 = g.conn.execute(text(cmd0), uid = uid, name = name, email = email, password = password)
+    cursor0.close()
+
+    # login invisibly
+    session['logged_in'] = True
+    session['uid'] = uid
+
+    return home();
+
+app.route('/deleteAccount', methods=['POST'])
+def deleteAccount():
+  uid = session.get('uid')
+  session.pop('logged_in', None)
+  cmd = 'DELETE FROM users WHERE uid = :uid'
+  cursor = g.conn.execute(text(cmd), uid = uid)
+  return home()
 
 @app.route('/new_group', methods=['POST'])
 def create_new_group():
@@ -525,11 +566,38 @@ def leave_group(gid):
   else:
     uid = session.get('uid')
 
-    # remove all comments on items from wishlists included in that group
+    # find the user's wishlist in the group
+    cmd = 'SELECT * FROM wishlist_in_group WHERE uid = :uid AND gid = :gid;'
+    cursor = g.conn.execute(text(cmd), uid = uid, gid = gid)
+    for result in cursor:
+      wid = result['wid']
+    cursor.close()
 
-    # remove that user's wishlist in the group (*will automatically remove items)
+    # get id's of items in wishlist
+    cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wid'
+    cursor1 = g.conn.execute(text(cmd1), wid = wid)
+    items = []
+    for result in cursor:
+      items.append(result['iid'])
+    cursor1.close()
+    
+    # delete all items (can remove later if we want to save previous items)
+    for iid in items:
+      cmd2 = 'DELETE FROM user_adds_items WHERE iid = :iid;'
+      cursor2 = g.conn.execute(text(cmd2), iid = iid)
+      cursor2.close()
+
+    # then delete the wishlist (will automatically erase from group)
+      cmd3 = 'DELETE FROM user_adds_wishlist WHERE wid = :wid;'
+      cursor3 = g.conn.execute(text(cmd3), wid = wid)
+      cursor3.close()
 
     # remove user from users_in_groups
+      cmd3 = 'DELETE FROM users_in_groups WHERE uid = :uid AND gid = :gid;'
+      cursor3 = g.conn.execute(text(cmd3), uid = uid, gid = gid)
+      cursor3.close()
+
+      return home()
 
 @app.route('/another')
 def another():

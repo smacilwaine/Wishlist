@@ -10,9 +10,14 @@
 <body>
 <h1>Create An Account</h1>
 
-Name: 
-Email:
-Password:
+<form action='/createAccount' method='POST'>
+	<input type='name' name='name' placeholder='Name'>
+	<input type='email' name='email' placeholder='Email'>
+	<input type='password' name='password' placeholder='password'>
+	<input type='submit' value='Create Account'>
+</form>
+
+<p>{{emailTaken}}</p>
 
 </body>
 
