@@ -221,6 +221,11 @@ def login():
   cursor.close()
   return home()
 
+@app.route('/logout')
+def logout():
+  session.pop('logged_in', None)
+  return home()
+
 @app.route('/createAccount')
 def createAccount():
   return render_template('createAccount.html')
