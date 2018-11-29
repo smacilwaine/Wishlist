@@ -396,6 +396,7 @@ def add_member_to_group(gid):
     return render_template('login.html')
   else:
     email = request.form['email']
+    new_mem_uid = 0
 
     # find the corresponding uid
     cmd = 'SELECT uid FROM users WHERE email = :email_addr'
@@ -405,10 +406,14 @@ def add_member_to_group(gid):
     cursor.close()
 
     # add user to group
-    cmd0 = 'INSERT INTO users_in_groups VALUES (:uid, :gid)'
-    cursor0 = g.conn.execute(text(cmd0), uid = new_mem_uid, gid = gid)
-    cursor0.close()
-
+    if (int(new_mem_uid) != 0):
+      cmd0 = 'INSERT INTO users_in_groups VALUES (:uid, :gid)'
+      cursor0 = g.conn.execute(text(cmd0), uid = new_mem_uid, gid = gid)
+      cursor0.close()
+    else:
+      errorMessage = "This user does not exist."
+      context = dict(errorMessage = errorMessage)
+      return render_template("error.html", **context)
     return group(gid)
 
 @app.route('/group/<gid>/new_wishlist')
@@ -598,6 +603,7 @@ def leave_group(gid):
     return render_template('login.html')
   else:
     uid = session.get('uid')
+    wid = 0
 
     # find the user's wishlist in the group
     cmd = 'SELECT * FROM wishlist_in_group WHERE uid = :uid AND gid = :gid;'
@@ -607,32 +613,38 @@ def leave_group(gid):
       print('wishlist to delete is: ', wid)
     cursor.close()
 
-    # get id's of items in wishlist
-    cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wwid'
-    cursor1 = g.conn.execute(text(cmd1), wwid = int(wid))
-    items = []
-    for result in cursor:
-      items.append(result['iid'])
-      print('item to delete is: ', result['iid'])
-    cursor1.close()
+    if (int(wid) != 0):
+
+      # get id's of items in wishlist
+      cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wwid;'
+      cursor1 = g.conn.execute(text(cmd1), wwid = int(wid))
+      items = []
+      for result in cursor1:
+        items.append(result['iid'])
+      cursor1.close()
     
-    # delete all items (can remove later if we want to save previous items)
-    for iid in items:
-      cmd2 = 'DELETE FROM user_adds_items WHERE iid = :iid;'
-      cursor2 = g.conn.execute(text(cmd2), iid = iid)
-      cursor2.close()
+      # delete all items (can remove later if we want to save previous items)
+      for iid in items:
+        cmd2 = 'DELETE FROM user_adds_items WHERE iid = :iid;'
+        cursor2 = g.conn.execute(text(cmd2), iid = iid)
+        cursor2.close()
+
+      # delete items from wishlist
+      cmd4 = 'DELETE FROM items_in_wishlist WHERE wid = :wid;'
+      cursor4 = g.conn.execute(text(cmd4), wid = wid)
+      cursor4.close()
 
     # then delete the wishlist (will automatically erase from group)
-      cmd3 = 'DELETE FROM user_adds_wishlist WHERE wid = :wid;'
-      cursor3 = g.conn.execute(text(cmd3), wid = wid)
-      cursor3.close()
-
+    cmd3 = 'DELETE FROM user_adds_wishlist WHERE wid = :wid;'
+    cursor3 = g.conn.execute(text(cmd3), wid = wid)
+    cursor3.close()
+    
     # remove user from users_in_groups
-      cmd3 = 'DELETE FROM users_in_groups WHERE uid = :uid AND gid = :gid;'
-      cursor3 = g.conn.execute(text(cmd3), uid = uid, gid = gid)
-      cursor3.close()
+    cmd5 = 'DELETE FROM users_in_groups WHERE uid = :uid AND gid = :gid;'
+    cursor5 = g.conn.execute(text(cmd5), uid = uid, gid = gid)
+    cursor5.close()
 
-      return home()
+    return home()
 
 @app.route('/another')
 def another():

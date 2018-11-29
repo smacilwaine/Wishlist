@@ -93,6 +93,9 @@
     color: white;
   }
 
+  .error {
+  	color: red;
+  }
 
 
   </style>
@@ -127,6 +130,8 @@
 	<div class="item"><b>{{m[1]}}</b></div>
 	{% endfor %}
 </div>
+
+<p class="error">{{errorMessage}}</p>
 
 <form action='/group/{{gid}}/add_members' method='POST'>
 	<input type='text' name='email' placeholder='new member email'>
