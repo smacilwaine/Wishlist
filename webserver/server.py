@@ -227,6 +227,10 @@ def logout():
   return home()
 
 @app.route('/createAccount')
+def createAccountPage():
+  return render_template('createAccount.html')
+
+@app.route('/createAccount', methods=['POST'])
 def createAccount():
 
   # get form info
@@ -235,12 +239,13 @@ def createAccount():
   password = request.form['password']
 
   # check that email is not taken
-  cmd1 = 'SELECT * FROM users WHERE email = :email'
+  cmd1 = 'SELECT * FROM users WHERE email = :email;'
   emailTaken = 0
-  cursor1 = g.conn.execute(cmd1, email = email)
+  cursor1 = g.conn.execute(text(cmd1), email = email)
   for result in cursor1: # should only be one result
     if result[0] != 0:
       emailTaken = 1
+  cursor1.close()
   if emailTaken == 1:
     errorMessage = "This email is already taken."
     context = dict(emailTaken = errorMessage)
@@ -260,6 +265,7 @@ def createAccount():
     # login invisibly
     session['logged_in'] = True
     session['uid'] = uid
+    session['name'] = name
 
     return home();
 
