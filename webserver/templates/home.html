@@ -1,33 +1,97 @@
 <html>
 <head>
-	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
-</head>
-  <style>
-    body{ 
-      font-size: 15pt;
-      font-family: arial;
-    }
-  </style>
+	<style>
 
+  html {
+    padding: 0 0 0 0;
+  }
+
+  body {
+    font-family: Arial;
+  }
+
+  h1 {
+    color: black;
+    text-align: center;
+    font-family: Arial;
+    font-size: 60px;
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .header {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     text-align: center;
+     background: url("https://www.pixelstalk.net/wp-content/uploads/2016/05/Gold-Glitter-Wallpaper-HD-For-Desktop.jpg");
+     background-repeat: no-repeat;
+     background-size: 100%;
+  }
+
+  .groupsHeader {
+    font-size: 30px;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    color: gray;
+  }
+
+  .groups {
+    font-size: 20px;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .groupItem {
+    padding-bottom: 10px;
+  }
+
+  a:link {
+    color: black;
+    text-decoration: none;
+  }
+  a:visited {
+    color: black;
+    text-decoration: none;
+  }
+  a:hover {
+    color: red;
+    text-decoration: underline;
+  }
+  a:active {
+    color: black;
+    text-decoration: underline;
+
+
+  </style>
+</head>
 
 <body>
-<h1>Welcome to Wishlist, {{user_name}}!</h1>
+<div class="fullPage">
+  <div class="Header">
+    <h1>Welcome to WISHLIST, {{user_name}}.</h1>
+  </div>
 
-<p>UID: {{uid}}</p>
-<div>
-	{% for g in groups %}
-	<div><a href="/group/{{g[0]}}">{{g[1]}}</a></div>
-	{% endfor %}
-</div>
+  <div class="groupsHeader">
+  <h2>Your Groups</h2>
+  </div>
 
-<p><a href="/logout">Logout</a></p>
+  <div class="groups">
+  	{% for g in groups %}
+  	<div class="groupItem"><a href="/group/{{g[0]}}">{{g[1]}}</a></div>
+  	{% endfor %}
+  </div>
 
-<p>Create a new group!</p>
-  <form action='/new_group' method='POST'>
-    <input type='text' name='group_name' placeholder='group name'>
-    <input type='submit' value='Create New Group'>
-  </form>
+  <p><a href="/logout">Logout</a></p>
 
+  <p>Create a new group!</p>
+    <form action='/new_group' method='POST'>
+      <input type='text' name='group_name' placeholder='group name'>
+      <input type='submit' value='Create New Group'>
+    </form>
+  </div>
 </body>
 
 

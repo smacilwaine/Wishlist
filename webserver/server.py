@@ -235,7 +235,7 @@ def createAccount():
   password = request.form['password']
 
   # check that email is not taken
-  cmd1 = 
+  cmd1 = 'SELECT * FROM users WHERE email = :email'
   emailTaken = 0
   cursor1 = g.conn.execute(cmd1, email = email)
   for result in cursor1: # should only be one result
@@ -248,9 +248,9 @@ def createAccount():
   else: 
     # get next available uid
     cursor = g.conn.execute("""SELECT MAX(uid) FROM users;""")
-      for result in cursor:
-        uid = int(result[0]) + 1
-      cursor.close()
+    for result in cursor:
+      uid = int(result[0]) + 1
+    cursor.close()
 
     # add to users
     cmd0 = 'INSERT INTO users (uid, name, email, password) VALUES (:uid, :name, :email, :password);'
@@ -571,14 +571,16 @@ def leave_group(gid):
     cursor = g.conn.execute(text(cmd), uid = uid, gid = gid)
     for result in cursor:
       wid = result['wid']
+      print('wishlist to delete is: ', wid)
     cursor.close()
 
     # get id's of items in wishlist
-    cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wid'
-    cursor1 = g.conn.execute(text(cmd1), wid = wid)
+    cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wwid'
+    cursor1 = g.conn.execute(text(cmd1), wwid = int(wid))
     items = []
     for result in cursor:
       items.append(result['iid'])
+      print('item to delete is: ', result['iid'])
     cursor1.close()
     
     # delete all items (can remove later if we want to save previous items)
