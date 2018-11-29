@@ -97,31 +97,43 @@
   	color: red;
   }
 
+  .nav {
+    margin-top: 5px;
+    padding-left: 15px;
+    margin-left: 5px;
+    font-size: 20px;
+    font-family: Arial;
+    background-color: white;
+    text-align: left;
+  }
+
 
   </style>
 
 
 <body>
 
-<p><a href="/">Back to Groups</a></p>
+<div class="nav"><p><a href="/">back to groups</a></p></div>
 
 <div class="header">
+  
 	<h1>{{groupname}}</h1>
 </div>
 
 <div class="boddy">
 <h2>wishlists</h2>
 
-{% if create_wishlist %}
-<div class="items">
-	<a href="/group/{{gid}}/new_wishlist">Create New Wishlist</a>
-</div>
-{% endif %}
 
 <div class="items">
 	{% for w in wishlists %} <!-- wid, uid, name -->
 	<div class="item"><b><a href="/group/{{gid}}/wishlist/{{w[0]}}">{{w[2]}}</a></b></div>
 	{% endfor %}
+
+  {% if create_wishlist %}
+  <div class="createNewWishlist">
+    <a href="/group/{{gid}}/new_wishlist">Create New Wishlist</a>
+  </div>
+  {% endif %}
 </div>
 
 <h2>members: </h2>

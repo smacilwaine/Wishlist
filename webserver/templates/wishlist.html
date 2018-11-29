@@ -24,40 +24,138 @@
      background-repeat: no-repeat;
      background-size: 100%;
   }
+
+  .nav {
+      margin-top: 5px;
+      padding-left: 15px;
+      margin-left: 5px;
+      font-size: 20px;
+      font-family: Arial;
+      background-color: white;
+      text-align: left;
+    }
+
+  a:link {
+    color: black;
+    text-decoration: none;
+  }
+  a:visited {
+    color: black;
+    text-decoration: none;
+  }
+  a:hover {
+    color: #c3f4c7;
+    text-decoration: underline;
+  }
+  a:active {
+    color: black;
+    text-decoration: underline;
+    }
+
+  .boddy {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background: url("https://spyrestudios.com/wp-content/uploads/christmas-paper/crumpled-paper.jpg");
+    width: 100%;
+  }
+
+  table {
+    margin-left: 20px;
+    margin-left: 20px;
+    font-size: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+  }
+
+  input[type='text']{
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    font-size: 15px;
+    font-family: Arial;
+    text-align: left;
+    margin-right: 20px;
+    display: block;
+    width: 400px;
+  }
+
+  input[type='submit'] {
+    padding: 6px 20px;
+    margin: 8px 0;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-family: Arial;
+    text-align: center;
+    display: block;
+  }
+
+  input[type='submit']:hover {
+    background-color: #c3f4c7;
+    color: white;
+  }
+
+  tr {
+    margin-right: 40px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: row;
+    width: 400px;
+    padding-top: 20px;
+  }
+
+  .comment {
+    width: 400px;
+  }
+
   </style>
 
 
 <body>
 
-<p><a href='/group/{{gid}}'>back</a></p>
+<div class="nav"><p><a href='/group/{{gid}}'>back to group</a></p></div>
 <div class="header"><h1>{{name}}'s wishlist</h1></div>
 
-<table>
-<!-- show table --> 
-	{% for row in table %}
-	<tr>
-		<td><b>{{row[0][1]}}</b></td>
-		{% for comment in row %}
-			{% if comment[3] %} <!-- if not the header --> 
-				<td><i>{{comment[3]}}</i>: {{comment[2]}}</td>
-				{% if uid == comment[0] %}
-				<td>
-					<form action='/group/{{gid}}/wishlist/{{wid}}/dc/{{comment[4]}}' method='POST'>
-						<input type='submit' value='delete'>
-					</form>
-				</td>
-				{% endif %}
-			{% endif %}
-		{% endfor %}
-		<td>
-			<form action='/group/{{gid}}/wishlist/{{wid}}/c/{{row[0][0]}}' method='POST'>
-				<input type='text' name='comment' placeholder='add comment'>
-				<input type='submit' value='add'>
-			</form>
-		</td>
-	</tr>
-	{% endfor %}
-</table>
+<div class="boddy">
+  <table>
+  <!-- show table --> 
+  	{% for row in table %}
+  	<tr>
+  		<td><b>{{row[0][1]}}</b></td>
+      </tr>
+  		{% for comment in row %}
+  			{% if comment[3] %} <!-- if not the header --> 
+          <tr>
+          <td></td>
+  				<div class="comment"><td><i>{{comment[3]}}</i>: {{comment[2]}}</td></div>
+  				{% if uid == comment[0] %}
+  				<td>
+  					<form action='/group/{{gid}}/wishlist/{{wid}}/dc/{{comment[4]}}' method='POST'>
+  						<input type='submit' value='delete'>
+  					</form>
+  				</td>
+          </tr>
+  				{% endif %}
+  			{% endif %}
+  		{% endfor %}
+      <tr class="comment">
+      <td></td>
+  		<td>
+  			<form action='/group/{{gid}}/wishlist/{{wid}}/c/{{row[0][0]}}' method='POST'>
+  				<div><input type='text' name='comment' placeholder='add comment'></div>
+  				<div><input type='submit' value='add'></div>
+  			</form>
+  		</td>
+      </tr>
+  	{% endfor %}
+  </table>
+</div>
+<p>
 
 </body>
 

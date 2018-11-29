@@ -535,7 +535,7 @@ def add_item_to_wishlist(gid, wid):
 
     return show_wishlist(gid, wid)
 
-@app.route('/group/<gid>/wishlist/<wid>/d/<iid>')
+@app.route('/group/<gid>/wishlist/<wid>/d/<iid>', methods=['POST'])
 def remove_item_from_wishlist(gid, wid, iid):
   if not session.get('logged_in'):
     return render_template('login.html')
@@ -596,6 +596,36 @@ def delete_comment(gid, wid, cid):
     cursor = g.conn.execute(text(cmd), cid = cid)
     cursor.close()
     return show_wishlist(gid, wid)
+
+@app.route('/deleteWishlist/<gid>/<wid>')
+def deleteWishlist(gid, wid):
+  if not session.get('logged_in'):
+    return render_template('login.html')
+  else:
+
+   # get id's of items in wishlist
+    cmd1 = 'SELECT * from items_in_wishlist WHERE wid = :wwid;'
+    cursor1 = g.conn.execute(text(cmd1), wwid = int(wid))
+    items = []
+    for result in cursor1:
+      items.append(result['iid'])
+    cursor1.close()
+  
+    # delete all items (can remove later if we want to save previous items)
+    for iid in items:
+      cmd2 = 'DELETE FROM user_adds_items WHERE iid = :iid;'
+      cursor2 = g.conn.execute(text(cmd2), iid = iid)
+      cursor2.close()
+
+    # delete items from wishlist
+    cmd4 = 'DELETE FROM items_in_wishlist WHERE wid = :wid;'
+    cursor4 = g.conn.execute(text(cmd4), wid = wid)
+    cursor4.close()
+    
+    cmd3 = 'DELETE FROM user_adds_wishlist WHERE wid = :wid;'
+    cursor3 = g.conn.execute(text(cmd3), wid = wid)
+    cursor3.close()
+    return group(gid)
 
 @app.route('/group/<gid>/leave_group')
 def leave_group(gid):
