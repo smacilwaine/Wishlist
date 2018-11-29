@@ -4,11 +4,17 @@
       font-size: 15pt;
       font-family: arial;
     }
+
+    .error {
+      color: red;
+    }
   </style>
 
 
 <body>
 <h1>Create An Account</h1>
+
+<p class="error">{{errorMessage}}</p>
 
 <form action='/createAccount' method='POST'>
 	<input type='name' name='name' placeholder='Name'>
@@ -17,7 +23,7 @@
 	<input type='submit' value='Create Account'>
 </form>
 
-<p>{{emailTaken}}</p>
+<p class="error">{{emailTaken}}</p>
 
 </body>
 

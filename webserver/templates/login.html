@@ -4,12 +4,17 @@
       font-size: 15pt;
       font-family: arial;
     }
+
+    .error {
+    	color: red;
+    }
   </style>
 
 
 <body>
 <h1>Login</h1>
 
+<p class="error">{{errorMessage}}</p>
 <form action='/' method='POST'>
 	<input type='email' name='email' placeholder='Email'>
 	<input type='password' name='password' placeholder='password'>

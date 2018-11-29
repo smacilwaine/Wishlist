@@ -183,8 +183,6 @@ def home():
     return render_template('login.html')
   else:
     ## pull all groups the user belongs to
-    se = session.get('uid')
-    before_request()
     cursor = g.conn.execute("""SELECT * from users_in_groups INNER JOIN groups ON users_in_groups.gid = groups.gid;""")
     groups = []
     for result in cursor:
@@ -201,25 +199,32 @@ def home():
 
 @app.route('/', methods=['POST'])
 def login():
-  before_request()
   cursor = g.conn.execute("""SELECT * FROM users;""")
   foundMatch = False
   pw = ''
+  isError = False
+  errorMessage = ''
   for result in cursor:
     if result['email'] == request.form['email']:
       foundMatch = True
       session['uid'] = result['uid']
       session['name'] = result['name']
-      pw = result['password'] # add use of Flask session capabilities to store current user name/id
+      pw = result['password']
   if foundMatch == False:
-    print('email not found. Please create an account') # need to give option to redirect and create account on login.html
+    isError = True
+    errorMessage = 'Email not found. Please create a new account.'
   else:
     if pw == request.form['password']:
       session['logged_in'] = True
     else:
-      print('wrong password')
+      isError = True
+      errorMessage = 'Incorrect password.'
   cursor.close()
-  return home()
+  if isError:
+    context = dict(errorMessage = errorMessage)
+    return render_template('login.html', **context)
+  else:
+    return home()
 
 @app.route('/logout')
 def logout():
@@ -237,6 +242,19 @@ def createAccount():
   name = request.form['name']
   email = request.form['email']
   password = request.form['password']
+
+  if name.strip() == '':
+    errorMessage = "Please enter your name."
+    context = dict(emailTaken = errorMessage)
+    return render_template('createAccount.html', **context)
+  elif email.strip() == '':
+    errorMessage = "Please enter your email."
+    context = dict(emailTaken = errorMessage)
+    return render_template('createAccount.html', **context)
+  elif password == '':
+    errorMessage = "Please enter your password."
+    context = dict(emailTaken = errorMessage)
+    return render_template('createAccount.html', **context)
 
   # check that email is not taken
   cmd1 = 'SELECT * FROM users WHERE email = :email;'
@@ -269,12 +287,21 @@ def createAccount():
 
     return home();
 
-app.route('/deleteAccount', methods=['POST'])
+@app.route('/deleteAccount')
 def deleteAccount():
+  print('deleting account!!!')
   uid = session.get('uid')
-  session.pop('logged_in', None)
+
+  # remove user from all groups
+  cmd0 = 'DELETE FROM users_in_groups WHERE uid = :uid'
+  cursor0 = g.conn.execute(text(cmd0), uid = uid)
+  cursor0.close()
+
+  # delete user
   cmd = 'DELETE FROM users WHERE uid = :uid'
   cursor = g.conn.execute(text(cmd), uid = uid)
+  cursor.close()
+  session.pop('logged_in', None)
   return home()
 
 @app.route('/new_group', methods=['POST'])
