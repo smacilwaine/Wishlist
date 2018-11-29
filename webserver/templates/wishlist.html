@@ -3,14 +3,34 @@
     body{ 
       font-size: 15pt;
       font-family: arial;
+      margin: 0;
     }
+
+    h1 {
+    color: white;
+    text-align: center;
+    font-family: Arial;
+    font-size: 60px;
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .header {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     text-align: center;
+     background: url("https://us.123rf.com/450wm/sergofan2015/sergofan20151603/sergofan2015160300104/56112345-crumpled-paper-colored-background.jpg?ver=6");
+     background-repeat: no-repeat;
+     background-size: 100%;
+  }
   </style>
 
 
 <body>
 
-<p><a href='/group/{{gid}}'>Back</a></p>
-<h1>{{name}}'s Wishlist</h1>
+<p><a href='/group/{{gid}}'>back</a></p>
+<div class="header"><h1>{{name}}'s wishlist</h1></div>
 
 <table>
 <!-- show table --> 
@@ -32,7 +52,7 @@
 		<td>
 			<form action='/group/{{gid}}/wishlist/{{wid}}/c/{{row[0][0]}}' method='POST'>
 				<input type='text' name='comment' placeholder='add comment'>
-				<input type='submit' value='Add'>
+				<input type='submit' value='add'>
 			</form>
 		</td>
 	</tr>

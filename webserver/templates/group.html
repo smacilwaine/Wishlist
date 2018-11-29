@@ -1,9 +1,100 @@
 <html>
   <style>
-    body{ 
-      font-size: 15pt;
-      font-family: arial;
+
+	body {
+	  font-family: Arial;
+	  margin: 0;
+	}
+
+    h1 {
+    color: white;
+    text-align: center;
+    font-family: Arial;
+    font-size: 60px;
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .header {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     text-align: center;
+     background: url("https://www.photohdx.com/images/2014/10/blue-wrinkled-paper-texture.jpg");
+     background-repeat: no-repeat;
+     background-size: 100%;
+  }
+
+  .items {
+    font-size: 20px;
+    padding-bottom: 20px;
+  }
+
+  .item {
+  	padding-bottom: 20px;
+  }
+
+  a:link {
+    color: black;
+    text-decoration: none;
+  }
+  a:visited {
+    color: black;
+    text-decoration: none;
+  }
+  a:hover {
+    color: #0073cc;
+    text-decoration: underline;
+  }
+  a:active {
+    color: black;
+    text-decoration: underline;
     }
+
+  h2 {
+  	padding-top: 30px;
+  	padding-bottom: 30px;
+  	color: gray;
+  	font-size: 50px;
+  	margin: 0 0 0 0;
+  }
+
+  .boddy {
+  	padding-top: 30px;
+  	padding-bottom: 30px;
+  	flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background: url("https://spyrestudios.com/wp-content/uploads/christmas-paper/crumpled-paper.jpg");
+  }
+
+  input[type='text']{
+    padding: 8px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    font-size: 20px;
+    font-family: Arial;
+    text-align: right;
+    padding-right: 10px;
+  }
+
+  input[type='submit'] {
+    padding: 6px 20px;
+    margin: 8px 0;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-family: Arial;
+    text-align: center;
+  }
+
+  input[type='submit']:hover {
+    background-color: #0073cc;
+    color: white;
+  }
+
+
+
   </style>
 
 
@@ -11,10 +102,12 @@
 
 <p><a href="/">Back to Groups</a></p>
 
-<h1>{{groupname}}</h1>
-<p>Group #{{gid}}</p>
+<div class="header">
+	<h1>{{groupname}}</h1>
+</div>
 
-<h2>Wishlists</h2>
+<div class="boddy">
+<h2>wishlists</h2>
 
 {% if create_wishlist %}
 <div>
@@ -22,27 +115,26 @@
 </div>
 {% endif %}
 
-<div>
+<div class="items">
 	{% for w in wishlists %} <!-- wid, uid, name -->
-	<div><a href="/group/{{gid}}/wishlist/{{w[0]}}">{{w[2]}}</a></div>
+	<div class="item"><b><a href="/group/{{gid}}/wishlist/{{w[0]}}">{{w[2]}}</a></b></div>
 	{% endfor %}
 </div>
 
-<h3>Members: </h3>
-<div>
+<h2>members: </h2>
+<div class="items">
 	{% for m in members %}
-	<div>{{m[1]}}</div>
+	<div class="item"><b>{{m[1]}}</b></div>
 	{% endfor %}
 </div>
 
-<h3>Add Members</h3>
 <form action='/group/{{gid}}/add_members' method='POST'>
-	<input type='text' name='email' placeholder='Enter new member email'>
-	<input type='submit' value='Add to Group'>
+	<input type='text' name='email' placeholder='new member email'>
+	<input type='submit' value='add to group'>
 </form>
 
-<p><a href='/group/{{gid}}/leave_group'>Leave Group</a></p>
-
+<p><a href='/group/{{gid}}/leave_group'>leave group</a></p>
+</div>
 
 </body>
 

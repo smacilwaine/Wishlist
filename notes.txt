@@ -19,6 +19,7 @@ TO-DO BEFORE SUBMIT:
 - add quicklinks to wishlist from homepage (takes you to within the group)
 - Show all wishlists in the home page
 - Add change password feature
+- Add delete wishlist feature!!!
 
 
 QUESTIONS TO ASK BEFORE WE SUBMIT:
