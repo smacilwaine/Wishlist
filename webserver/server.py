@@ -309,25 +309,27 @@ def create_new_group():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
+
     # get group name
     group_name = request.form['group_name'] # does not need to be unique
+    if (group_name.strip() != ''):
 
-    # get new group id
-    cursor = g.conn.execute("""SELECT MAX(gid) FROM groups;""")
-    for result in cursor:
-      gid = int(result[0]) + 1
-    cursor.close()
+      # get new group id
+      cursor = g.conn.execute("""SELECT MAX(gid) FROM groups;""")
+      for result in cursor:
+        gid = int(result[0]) + 1
+      cursor.close()
 
-    # create group
-    cmd0 = 'INSERT INTO groups (gid, name) VALUES (:gid, :name)'
-    cursor0 = g.conn.execute(text(cmd0), gid = gid, name = group_name)
-    cursor0.close()
+      # create group
+      cmd0 = 'INSERT INTO groups (gid, name) VALUES (:gid, :name)'
+      cursor0 = g.conn.execute(text(cmd0), gid = gid, name = group_name)
+      cursor0.close()
 
-    # add owner to group
-    uid = session.get('uid')
-    cmd1 = 'INSERT INTO users_in_groups (uid, gid) VALUES (:uid, :gid)'
-    cursor1 = g.conn.execute(text(cmd1), uid = uid, gid = gid)
-    cursor1.close()
+      # add owner to group
+      uid = session.get('uid')
+      cmd1 = 'INSERT INTO users_in_groups (uid, gid) VALUES (:uid, :gid)'
+      cursor1 = g.conn.execute(text(cmd1), uid = uid, gid = gid)
+      cursor1.close()
 
     return group(gid)
 
@@ -621,7 +623,7 @@ def deleteWishlist(gid, wid):
     cmd4 = 'DELETE FROM items_in_wishlist WHERE wid = :wid;'
     cursor4 = g.conn.execute(text(cmd4), wid = wid)
     cursor4.close()
-    
+
     cmd3 = 'DELETE FROM user_adds_wishlist WHERE wid = :wid;'
     cursor3 = g.conn.execute(text(cmd3), wid = wid)
     cursor3.close()
@@ -673,6 +675,20 @@ def leave_group(gid):
     cmd5 = 'DELETE FROM users_in_groups WHERE uid = :uid AND gid = :gid;'
     cursor5 = g.conn.execute(text(cmd5), uid = uid, gid = gid)
     cursor5.close()
+
+    # if group is empty, then delete group
+    cmd6 = 'SELECT count(*) FROM users_in_groups WHERE gid = :gid;'
+    cursor6 = g.conn.execute(text(cmd6), gid = gid)
+    c = 2
+    for result in cursor6:
+      c = result[0]
+    cursor6.close()
+    if (int(c) < 1):
+      # remove group because there are no more members
+      cmd7 = 'DELETE FROM groups WHERE gid = :gid;'
+      cursor7 = g.conn.execute(text(cmd7), gid = gid)
+      cursor7.close()
+
 
     return home()
 
